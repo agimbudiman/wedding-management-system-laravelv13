@@ -167,71 +167,7 @@ package.json
 README.md
 ```
 
----
 
-# ⚙ Installation
-
-Clone repository
-
-```bash
-git clone https://github.com/yourusername/wedding-management-system.git
-```
-
-Masuk ke folder project
-
-```bash
-cd wedding-management-system
-```
-
-Install dependency
-
-```bash
-composer install
-```
-
-Install Node Package
-
-```bash
-npm install
-```
-
-Copy environment
-
-```bash
-cp .env.example .env
-```
-
-Generate key
-
-```bash
-php artisan key:generate
-```
-
-Migration Database
-
-```bash
-php artisan migrate
-```
-
-Storage Link
-
-```bash
-php artisan storage:link
-```
-
-Run Application
-
-```bash
-php artisan serve
-```
-
-Compile Assets
-
-```bash
-npm run dev
-```
-
----
 
 # 🔒 Security
 
@@ -283,50 +219,9 @@ Testing performed in this project includes:
 
 ---
 
-# 🎓 Academic Information
-
-This project was developed as part of the undergraduate thesis:
-
-**Title**
-
-> **Design and Development of a Web-Based Wedding Organizer Management Information System Using the Prototype Method**
-
-Faculty of Applied Science
-
-Information Systems Study Program
-
----
 
 # 👨‍💻 Contributor
 
 ## Muhamad Agim Budiman
-
-Undergraduate Student
-
-Information Systems
-
-Institute of Education Indonesia (IPI) Garut
-
-GitHub:
-
-> https://github.com/yourusername
-
 ---
 
-# 📄 License
-
-This project is developed for academic purposes.
-
-MIT License.
-
----
-
-# ⭐ Support
-
-If you find this project useful, don't forget to give this repository a **⭐ Star**.
-
----
-
-<p align="center">
-Made with ❤️ using Laravel 13
-</p>
