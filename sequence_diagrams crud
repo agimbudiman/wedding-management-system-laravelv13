@@ -1,0 +1,158 @@
+# Sequence Diagram CRUD (Crew, Vendor, Package)
+
+Berikut adalah visualisasi alur Sequence Diagram untuk proses **Create, Read, Update, dan Delete (CRUD)** pada modul Crew, Vendor, dan Package. Diagram ini menggunakan notasi Mermaid.js untuk menggambarkan interaksi antara **Aktor (User/Admin)**, **Interface (Web App/Frontend)**, **Controller (Backend/API)**, dan **Database**.
+
+---
+
+## 1. Create (Tambah Data Baru)
+Alur ketika Admin menambahkan data Crew, Vendor, atau Package baru ke dalam sistem.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant Frontend as Web App (Form input)
+    participant Backend as Controller / API
+    participant DB as Database
+
+    Admin->>Frontend: Membuka Form Tambah Data
+    Frontend-->>Admin: Menampilkan Form Input
+    Admin->>Frontend: Mengisi Form & Klik "Simpan"
+    Frontend->>Frontend: Validasi Input Client-side
+    alt Validasi Gagal
+        Frontend-->>Admin: Tampilkan Pesan Error Validasi
+    else Validasi Berhasil
+        Frontend->>Backend: HTTP POST /api/[resource] (Request Data)
+        activate Backend
+        Backend->>Backend: Validasi Input Server-side
+        alt Validasi Server Gagal
+            Backend-->>Frontend: HTTP 422 Unprocessable Entity (Error JSON)
+            Frontend-->>Admin: Tampilkan Pesan Error
+        else Validasi Server Berhasil
+            Backend->>DB: INSERT INTO [crews/vendors/packages]
+            activate DB
+            DB-->>Backend: Konfirmasi Berhasil (ID Baru)
+            deactivate DB
+            Backend-->>Frontend: HTTP 201 Created (Success JSON)
+            deactivate Backend
+            Frontend-->>Admin: Tampilkan Notifikasi Sukses & Redirect ke List Page
+        end
+    end
+```
+
+---
+
+## 2. Read (Membaca & Menampilkan Data)
+Alur saat sistem menampilkan daftar data (List) atau detail data spesifik.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant Frontend as Web App (List/Detail Page)
+    participant Backend as Controller / API
+    participant DB as Database
+
+    Admin->>Frontend: Membuka Halaman Daftar Data
+    Frontend->>Backend: HTTP GET /api/[resource]
+    activate Backend
+    Backend->>DB: SELECT * FROM [crews/vendors/packages]
+    activate DB
+    DB-->>Backend: Hasil Query (Data Array)
+    deactivate DB
+    Backend-->>Frontend: HTTP 200 OK (Data JSON)
+    deactivate Backend
+    Frontend-->>Admin: Render & Tampilkan Tabel Data
+
+    note over Admin, Frontend: Alur Detail Data (View Detail)
+    Admin->>Frontend: Klik Detail Data (ID)
+    Frontend->>Backend: HTTP GET /api/[resource]/{id}
+    activate Backend
+    Backend->>DB: SELECT * FROM [table] WHERE id = {id}
+    activate DB
+    DB-->>Backend: Single Row Data
+    deactivate DB
+    Backend-->>Frontend: HTTP 200 OK (Data JSON Object)
+    deactivate Backend
+    Frontend-->>Admin: Tampilkan Detail Modal/Halaman Detail
+```
+
+---
+
+## 3. Update (Mengubah Data)
+Alur ketika Admin memperbarui data yang sudah ada di database.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant Frontend as Web App (Edit Form)
+    participant Backend as Controller / API
+    participant DB as Database
+
+    Admin->>Frontend: Klik Tombol "Edit" Data (ID)
+    Frontend->>Backend: HTTP GET /api/[resource]/{id}/edit
+    activate Backend
+    Backend->>DB: SELECT * FROM [table] WHERE id = {id}
+    activate DB
+    DB-->>Backend: Data Saat Ini
+    deactivate DB
+    Backend-->>Frontend: HTTP 200 OK (Data JSON)
+    deactivate Backend
+    Frontend-->>Admin: Tampilkan Form Edit dengan Data Terisi
+
+    Admin->>Frontend: Mengubah Data & Klik "Simpan Perubahan"
+    Frontend->>Frontend: Validasi Input Client-side
+    alt Validasi Gagal
+        Frontend-->>Admin: Tampilkan Pesan Error Validasi
+    else Validasi Berhasil
+        Frontend->>Backend: HTTP PUT/PATCH /api/[resource]/{id} (Request Data)
+        activate Backend
+        Backend->>Backend: Validasi Input Server-side
+        alt Validasi Server Gagal
+            Backend-->>Frontend: HTTP 422 Unprocessable Entity
+            Frontend-->>Admin: Tampilkan Pesan Error
+        else Validasi Server Berhasil
+            Backend->>DB: UPDATE [table] SET ... WHERE id = {id}
+            activate DB
+            DB-->>Backend: Konfirmasi Update Berhasil
+            deactivate DB
+            Backend-->>Frontend: HTTP 200 OK (Success JSON)
+            deactivate Backend
+            Frontend-->>Admin: Tampilkan Notifikasi Sukses & Refresh/Redirect Halaman
+        end
+    end
+```
+
+---
+
+## 4. Delete (Menghapus Data)
+Alur ketika Admin menghapus data secara permanen atau soft delete.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant Frontend as Web App (List Page)
+    participant Backend as Controller / API
+    participant DB as Database
+
+    Admin->>Frontend: Klik Tombol "Hapus" pada Data Tertentu
+    Frontend-->>Admin: Tampilkan Dialog Konfirmasi ("Yakin ingin menghapus?")
+    alt Admin membatalkan (Cancel)
+        Admin->>Frontend: Klik "Batal"
+        Frontend-->>Admin: Tutup Dialog (Data tidak dihapus)
+    else Admin menyetujui (Confirm)
+        Admin->>Frontend: Klik "Ya, Hapus"
+        Frontend->>Backend: HTTP DELETE /api/[resource]/{id}
+        activate Backend
+        Backend->>DB: DELETE FROM [table] WHERE id = {id}
+        activate DB
+        DB-->>Backend: Konfirmasi Data Terhapus
+        deactivate DB
+        Backend-->>Frontend: HTTP 200 OK (Success JSON)
+        deactivate Backend
+        Frontend->>Frontend: Hapus Baris Data dari UI DOM
+        Frontend-->>Admin: Tampilkan Notifikasi Berhasil Dihapus
+    end
+```
